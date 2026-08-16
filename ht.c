@@ -36,7 +36,7 @@ ht* ht_create(void)
 // Free memory allocated for hash table, including allocated keys.
 void ht_destroy(ht* table)
 {
-	for (size_int i = 0; i < table->length; i++) {
+	for (size_t i = 0; i < table->length; i++) {
 		free((void*)table->entries[i].key);
 	}
 	free(table -> entries);

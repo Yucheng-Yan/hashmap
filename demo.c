@@ -52,6 +52,6 @@ int main(void) {
     // // Show the number of unique words.
     // printf("%d\n", (int)ht_length(counts));
 
-    // ht_destroy(counts);
+    ht_destroy(counts);
     return 0;
 }
