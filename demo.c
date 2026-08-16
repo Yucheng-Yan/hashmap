@@ -19,29 +19,28 @@ int main(void) {
         exit_nomem();
     }
 
-    // // Read next word from stdin (at most 100 chars long).
-    // char word[101];
-    // while (scanf("%100s", word) != EOF) {
-    //     // Look up word.
-    //     void* value = ht_get(counts, word);
-    //     if (value != NULL) {
-    //         // Already exists, increment int that value points to.
-    //         int* pcount = (int*)value;
-    //         (*pcount)++;
-    //         continue;
-    //     }
+    // Read next word from stdin (at most 100 chars long).
+    char word[101];
+    while (scanf("%100s", word) != EOF) {
+       // Look up word.
+       void* value = ht_get(counts, word);
+       if (value != NULL) {
+           // Already exists, increment int that value points to.
+           int* pcount = (int*)value;
+           (*pcount)++;
+           continue;
+       }
 
-    //     // Word not found, allocate space for new int and set to 1.
-    //     int* pcount = malloc(sizeof(int));
-    //     if (pcount == NULL) {
-    //         exit_nomem();
-    //     }
-    //     *pcount = 1;
-    //     if (ht_set(counts, word, pcount) == NULL) {
-    //         exit_nomem();
-    //     }
-    // }
-
+       // Word not found, allocate space for new int and set to 1.
+       int* pcount = malloc(sizeof(int));
+       if (pcount == NULL) {
+           exit_nomem();
+       }
+       //*pcount = 1;
+       //if (ht_set(counts, word, pcount) == NULL) {
+       //    exit_nomem();
+       //}
+	}
     // // Print out words and frequencies, freeing values as we go.
     // hti it = ht_iterator(counts);
     // while (ht_next(&it)) {

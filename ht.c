@@ -1,4 +1,5 @@
 #include "ht.h"
+#include <string.h>
 #include <stdlib.h>
 
 // Hash table structure: create with ht_create, free with ht_destroy.
@@ -36,16 +37,46 @@ ht* ht_create(void)
 // Free memory allocated for hash table, including allocated keys.
 void ht_destroy(ht* table)
 {
-	for (size_t i = 0; i < table->length; i++) {
+	for (size_t i = 0; i < table->capacity; i++) {
 		free((void*)table->entries[i].key);
 	}
 	free(table -> entries);
 	free(table);
 }
 
+#define FNV_OFFSET 14695981039346656037UL
+#define FNV_PRIME 1099511628211UL
+
+// Return 64-bit FNV-1a hash for key (NUL-terminated).
+static uint64_t hash_key(const char* key) 
+{
+	uint64_t hash = FNV_OFFSET;
+	for (const char* p = key; *p; p++) {
+		hash ^= (uint64_t)(unsigned char)(*p);
+		hash *= FNV_PRIME;
+	}
+	return hash;
+}
+
 // Get item with given key (NUL-terminated) from hash table. Return
 // value (which was set with ht_set), or NULL if key not found.
-void* ht_get(ht* table, const char* key);
+void* ht_get(ht* table, const char* key)
+{
+	uint64_t hashVal = hash_key(key);
+	size_t index = hashVal % table->capacity;
+	
+	while (table->entries[index].key != NULL) {
+		if (strcmp(table->entries[index].key, key) == 0)
+			return table->entries[index].value;
+		index++;
+
+		if (index >= table->capacity)
+			index = 0;
+	}	
+	
+	return NULL;
+
+}
 
 // Set item with given key (NUL-terminated) to value (which must not
 // be NULL). If not already present in table, key is copied to newly
