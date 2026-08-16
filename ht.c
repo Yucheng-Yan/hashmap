@@ -34,7 +34,14 @@ ht* ht_create(void)
 	return table;
 }
 // Free memory allocated for hash table, including allocated keys.
-void ht_destroy(ht* table);
+void ht_destroy(ht* table)
+{
+	for (size_int i = 0; i < table->length; i++) {
+		free((void*)table->entries[i].key);
+	}
+	free(table -> entries);
+	free(table);
+}
 
 // Get item with given key (NUL-terminated) from hash table. Return
 // value (which was set with ht_set), or NULL if key not found.
