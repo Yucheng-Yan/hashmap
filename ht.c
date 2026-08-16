@@ -1,6 +1,7 @@
 #include "ht.h"
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 // Hash table structure: create with ht_create, free with ht_destroy.
 typedef struct {
@@ -80,9 +81,9 @@ void* ht_get(ht* table, const char* key)
 
 static const char* ht_set_entry(ht_entry* entries, size_t capacity, const char* key, void* value, size_t* plength) {
 	uint64_t hashVal = hash_key(key);
-	size_t index = hashVal % table->capacity;
+	size_t index = hashVal % capacity;
 
-	while (entries[index] != NULL) {
+	while (entries[index].key != NULL) {
 		if (strcmp(entries[index].key, key) == 0) {
 			entries[index].value = value;
 			return entries[index].key;
@@ -107,21 +108,21 @@ static const char* ht_set_entry(ht_entry* entries, size_t capacity, const char* 
 
 static bool ht_expand(ht* table) {
 	size_t new_capacity = table->capacity * 2;
-	if (new_capacity < teble->capacity)
+	if (new_capacity < table->capacity)
 		return false; // overflow
 
-	ht_entry* new_entires = calloc(new_capacipty, sizeof(ht_entry));
+	ht_entry* new_entries = calloc(new_capacity, sizeof(ht_entry));
 	if (new_entries == NULL)
 		return false;
 
 	for (size_t i = 0; i < table->capacity; i++) {
-		ht_entry entry = table->entires[i];
+		ht_entry entry = table->entries[i];
 		if(entry.key != NULL) {
 			ht_set_entry(new_entries, new_capacity, entry.key, entry.value, NULL);
 		}
 	}
 
-	free(table->entires);
+	free(table->entries);
 	table->entries = new_entries;
 	table->capacity = new_capacity;
 	return true;
@@ -147,12 +148,35 @@ const char* ht_set(ht* table, const char* key, void* value)
 }
 
 // Return number of items in hash table.
-size_t ht_length(ht* table);
+size_t ht_length(ht* table)
+{
+	return table->length;
+}
 
 // Return new hash table iterator (for use with ht_next).
-hti ht_iterator(ht* table);
+hti ht_iterator(ht* table)
+{
+	hti it;
+	it._table = table;
+	it._index = 0;
+	return it;
+}
 
 // Move iterator to next item in hash table, update iterator's key
 // and value to current item, and return true. If there are no more
 // items, return false. Don't call ht_set during iteration.
-bool ht_next(hti* it);
+bool ht_next(hti* it)
+{
+	ht* table = it->_table;
+	while (it->_index < table->capacity) {
+		size_t i = it->_index;
+		it->_index++;
+		if (table->entries[i].key != NULL) {
+			ht_entry entry = table->entries[i];
+			it->key = entry.key;
+			it->value = entry.value;
+			return true;
+		}
+	}
+	return false;
+}

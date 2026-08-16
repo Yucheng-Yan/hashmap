@@ -36,20 +36,20 @@ int main(void) {
        if (pcount == NULL) {
            exit_nomem();
        }
-       //*pcount = 1;
-       //if (ht_set(counts, word, pcount) == NULL) {
-       //    exit_nomem();
-       //}
+       *pcount = 1;
+       if (ht_set(counts, word, pcount) == NULL) {
+           exit_nomem();
+       }
 	}
-    // // Print out words and frequencies, freeing values as we go.
-    // hti it = ht_iterator(counts);
-    // while (ht_next(&it)) {
-    //     printf("%s %d\n", it.key, *(int*)it.value);
-    //     free(it.value);
-    // }
+    // Print out words and frequencies, freeing values as we go.
+    hti it = ht_iterator(counts);
+    while (ht_next(&it)) {
+        printf("%s %d\n", it.key, *(int*)it.value);
+        free(it.value);
+    }
 
-    // // Show the number of unique words.
-    // printf("%d\n", (int)ht_length(counts));
+    // Show the number of unique words.
+    printf("%d\n", (int)ht_length(counts));
 
     ht_destroy(counts);
     return 0;
