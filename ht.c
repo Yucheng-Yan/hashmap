@@ -99,10 +99,32 @@ static const char* ht_set_entry(ht_entry* entries, size_t capacity, const char* 
 			return NULL;
 		(*plength)++;
 	}
-	entries[index].key = (char*)key;
+	entries[index].key = key;
 	entries[index].value = value;
 	return key;
 	
+}
+
+static bool ht_expand(ht* table) {
+	size_t new_capacity = table->capacity * 2;
+	if (new_capacity < teble->capacity)
+		return false; // overflow
+
+	ht_entry* new_entires = calloc(new_capacipty, sizeof(ht_entry));
+	if (new_entries == NULL)
+		return false;
+
+	for (size_t i = 0; i < table->capacity; i++) {
+		ht_entry entry = table->entires[i];
+		if(entry.key != NULL) {
+			ht_set_entry(new_entries, new_capacity, entry.key, entry.value, NULL);
+		}
+	}
+
+	free(table->entires);
+	table->entries = new_entries;
+	table->capacity = new_capacity;
+	return true;
 }
 
 
