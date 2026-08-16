@@ -78,11 +78,51 @@ void* ht_get(ht* table, const char* key)
 
 }
 
+static const char* ht_set_entry(ht_entry* entries, size_t capacity, const char* key, void* value, size_t* plength) {
+	uint64_t hashVal = hash_key(key);
+	size_t index = hashVal % table->capacity;
+
+	while (entries[index] != NULL) {
+		if (strcmp(entries[index].key, key) == 0) {
+			entries[index].value = value;
+			return entries[index].key;
+		}
+		index++;
+		if (index >= capacity) {
+			index = 0;
+		}	
+	}
+
+	if (plength != NULL) {
+		key = strdup(key);
+		if (key == NULL)
+			return NULL;
+		(*plength)++;
+	}
+	entries[index].key = (char*)key;
+	entries[index].value = value;
+	return key;
+	
+}
+
+
 // Set item with given key (NUL-terminated) to value (which must not
 // be NULL). If not already present in table, key is copied to newly
 // allocated memory (keys are freed automatically when ht_destroy is
 // called). Return address of copied key, or NULL if out of memory.
-const char* ht_set(ht* table, const char* key, void* value);
+const char* ht_set(ht* table, const char* key, void* value)
+{
+	assert(value != NULL);
+	if (value == NULL)
+		return NULL;
+
+	if (table->length >= table->capacity / 2) {
+		if (!ht_expand(table))
+			return NULL;
+	}
+
+	return ht_set_entry(table->entries, table->capacity, key, value, &table->length);
+}
 
 // Return number of items in hash table.
 size_t ht_length(ht* table);
